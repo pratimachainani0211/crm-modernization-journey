@@ -2,7 +2,6 @@
 
 Legacy monolith to microservices transformation using Strangler Fig pattern.
 
-<<<<<<< HEAD
 ## Phases
 
 | Phase | Description | Branch | Status |
