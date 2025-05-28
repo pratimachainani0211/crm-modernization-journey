@@ -31,5 +31,16 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: password
 
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8000:8000"
+    depends_on:
+      legacy-app:
+        condition: service_started
+    environment:
+      LEGACY_SERVICE_URL: http://legacy-app:8080
+      SERVER_PORT: 8000
+
 volumes:
   legacy_data:
