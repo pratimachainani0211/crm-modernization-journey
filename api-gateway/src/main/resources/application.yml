@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: api-gateway
+
+server:
+  port: 8000
+
+logging:
+  level:
+    com.crm.gateway: DEBUG
+    root: INFO
+
+# Service URLs for routing
+legacy:
+  service:
+    url: http://legacy-app:8080
