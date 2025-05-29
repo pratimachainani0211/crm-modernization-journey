@@ -18,6 +18,23 @@ services:
       timeout: 5s
       retries: 10
 
+  customer-db:
+    image: postgres:15
+    container_name: customer-service-db
+    environment:
+      POSTGRES_DB: customer_service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+    volumes:
+      - customer_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d legacy_crm" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   legacy-app:
     build: ./legacy-crm
     container_name: legacy-crm-app
@@ -31,5 +48,32 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: password
 
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8000:8000"
+    depends_on:
+      legacy-app:
+        condition: service_started
+      customer-service:
+        condition: service_started
+    environment:
+      LEGACY_SERVICE_URL: http://legacy-app:8080
+      SERVER_PORT: 8000
+      CUSTOMER_SERVICE_URL: http://customer-service:8081
+
+  customer-service:
+    build: ./customer-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      customer-db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://customer-db:5432/customer_service
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+
 volumes:
   legacy_data:
+  customer_data:

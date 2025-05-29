@@ -1,37 +1,37 @@
-plugins {
-    id 'java'
-    id 'org.springframework.boot' version '3.2.0'
-    id 'io.spring.dependency-management' version '1.1.4'
-}
-
-group = 'com.crm.legacy'
-version = '0.0.1-SNAPSHOT'
-
-java {
-    sourceCompatibility = '17'
-}
-
-repositories {
-    mavenCentral()
-}
-
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
+    plugins {
+        id 'java'
+        id 'org.springframework.boot' version '3.2.0'
+        id 'io.spring.dependency-management' version '1.1.4'
     }
-}
 
-dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
-    implementation 'org.postgresql:postgresql'
+    group = 'com.crm.legacy'
+    version = '0.0.1-SNAPSHOT'
 
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
+    java {
+        sourceCompatibility = '17'
+    }
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-}
+    repositories {
+        mavenCentral()
+    }
 
-tasks.named('test') {
-    useJUnitPlatform()
-}
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+    }
+
+    dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+        implementation 'org.postgresql:postgresql'
+
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    }
+
+    tasks.named('test') {
+        useJUnitPlatform()
+    }
