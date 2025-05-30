@@ -15,6 +15,11 @@ public class CustomerController {
 
     private final CustomerService customerService;
 
+    @GetMapping("/health")
+    public ResponseEntity<String> health() {
+        return ResponseEntity.ok("{\"status\":\"UP\",\"service\":\"Customer Service\"}");
+    }
+
     @GetMapping
     public ResponseEntity<List<Customer>> getAllCustomers() {
         return ResponseEntity.ok(customerService.getAllCustomers());

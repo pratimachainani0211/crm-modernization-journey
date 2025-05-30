@@ -14,3 +14,11 @@ logging:
 legacy:
   service:
     url: http://legacy-app:8080
+
+customer:
+  service:
+    url: http://customer-service:8081
+
+order:
+  service:
+    url: http://order-service:8082

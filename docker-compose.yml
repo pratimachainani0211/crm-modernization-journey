@@ -35,6 +35,23 @@ services:
       timeout: 5s
       retries: 10
 
+  order-db:
+    image: postgres:15
+    container_name: order-service-db
+    environment:
+      POSTGRES_DB: order_service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5434:5432"
+    volumes:
+      - order_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d order_service" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   legacy-app:
     build: ./legacy-crm
     container_name: legacy-crm-app
@@ -57,10 +74,13 @@ services:
         condition: service_started
       customer-service:
         condition: service_started
+      order-service:
+        condition: service_started
     environment:
       LEGACY_SERVICE_URL: http://legacy-app:8080
       SERVER_PORT: 8000
       CUSTOMER_SERVICE_URL: http://customer-service:8081
+      ORDER_SERVICE_URL: http://order-service:8082
 
   customer-service:
     build: ./customer-service
@@ -75,6 +95,23 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: password
 
+  order-service:
+    build: ./order-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      order-db:
+        condition: service_healthy
+      customer-service:
+        condition: service_started
+    environment:
+      SERVER_PORT: 8082
+      SPRING_DATASOURCE_URL: jdbc:postgresql://order-db:5432/order_service
+      CUSTOMER_SERVICE_URL: http://customer-service:8081
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+
 volumes:
   legacy_data:
   customer_data:
+  order_data:

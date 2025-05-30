@@ -1,26 +1,18 @@
--- Fixed schema.sql - Clean and working version
+-- Legacy CRM Database Schema (Reduced - customers and orders moved to microservices)
+-- Only keeping products and other non-extracted domains
 
--- Create customers table
-CREATE TABLE IF NOT EXISTS customers (
+CREATE TABLE IF NOT EXISTS products (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL
+    name VARCHAR(200) NOT NULL,
+    description TEXT,
+    price DECIMAL(10,2) NOT NULL,
+    stock_quantity INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create orders table
-CREATE TABLE IF NOT EXISTS orders (
-    id SERIAL PRIMARY KEY,
-    customer_id INTEGER NOT NULL,
-    total DECIMAL(10,2) NOT NULL
-);
-
--- Insert sample data (with conflict handling)
-INSERT INTO customers (name, email) VALUES
-('John Doe', 'john@example.com'),
-('Jane Smith', 'jane@example.com')
-ON CONFLICT (email) DO NOTHING;
-
-INSERT INTO orders (customer_id, total) VALUES
-(1, 299.99),
-(2, 599.99)
+-- Sample product data
+INSERT INTO products (name, description, price, stock_quantity) VALUES
+('Laptop', 'High-performance laptop', 299.99, 10),
+('Phone', 'Smartphone with great camera', 599.99, 25),
+('Headphones', 'Noise-cancelling headphones', 199.99, 15)
 ON CONFLICT DO NOTHING;
