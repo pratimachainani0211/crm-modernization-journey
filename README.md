@@ -79,8 +79,8 @@ curl http://localhost:8000/api/v1/customers
 |-------|-------------|--------|-------------|---------|
 | **Phase 0** | Legacy Monolith | [`phase-0-legacy`](../../tree/phase-0-legacy) | Anti-patterns | ✅ Available |
 | **Phase 1** | API Gateway | [`phase-1-api-gateway`](../../tree/phase-1-api-gateway) | Strangler Fig | ✅ Available |
-| **Phase 2** | Customer Service | [`phase-2-customer-service`](../../tree/phase-2-customer-service) | Domain Extraction | 🚧 Coming Soon |
-| **Phase 3** | Order Service | [`phase-3-order-service`](../../tree/phase-3-order-service) | Inter-service Communication | ⏳ Planned |
+| **Phase 2** | Customer Service | [`phase-2-customer-service`](../../tree/phase-2-customer-service) | Domain Extraction | ✅ Available |
+| **Phase 3** | Order Service | [`phase-3-order-service`](../../tree/phase-3-order-service) | Inter-service Communication | 🚧 Coming Soon |
 | **Phase 4** | Complete System | [`phase-4-complete`](../../tree/phase-4-complete) | Legacy Retirement | ⏳ Planned |
 
 ---
