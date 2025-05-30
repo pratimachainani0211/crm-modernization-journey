@@ -30,7 +30,7 @@ services:
     volumes:
       - customer_data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres -d legacy_crm" ]
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d customer_service" ]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -70,6 +70,7 @@ services:
       customer-db:
         condition: service_healthy
     environment:
+      SERVER_PORT: 8081
       SPRING_DATASOURCE_URL: jdbc:postgresql://customer-db:5432/customer_service
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: password
