@@ -22,7 +22,11 @@ configurations {
 }
 
 dependencies {
+    implementation project(':shared-lib')
     implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // Rate limiting
+    implementation 'com.bucket4j:bucket4j_jdk17-core:8.14.0'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -32,4 +36,9 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+jar {
+    enabled = false
+    archiveClassifier = ''
 }

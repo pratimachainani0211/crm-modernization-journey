@@ -1,0 +1,71 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
+}
+
+dependencies {
+    // Spring Boot Core
+    api 'org.springframework.boot:spring-boot-starter'
+    api 'org.springframework.boot:spring-boot-starter-web'
+    api 'org.springframework.boot:spring-boot-starter-data-jpa'
+    api 'org.springframework.boot:spring-boot-starter-validation'
+
+    // Redis for Event Bus
+    api 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // Circuit Breakers & Resilience
+    api 'io.github.resilience4j:resilience4j-spring-boot3:2.1.0'
+    api 'io.github.resilience4j:resilience4j-circuitbreaker:2.1.0'
+
+    // Rate Limiting
+    api 'com.github.vladimir-bukhtoyarov:bucket4j-core:7.6.0'
+
+    // JSON Processing
+    api 'com.fasterxml.jackson.core:jackson-databind'
+    api 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
+    // Database
+    api 'org.postgresql:postgresql'
+
+    // Monitoring & Metrics
+    api 'org.springframework.boot:spring-boot-starter-actuator'
+    api 'io.micrometer:micrometer-registry-prometheus'
+
+    // Distributed Tracing
+    api 'org.springframework.cloud:spring-cloud-starter-sleuth:3.1.9'
+    api 'org.springframework.cloud:spring-cloud-sleuth-zipkin:3.1.9'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2022.0.4'
+    }
+}
+
+// Disable bootJar for library project
+jar {
+    enabled = true
+    archiveClassifier = ''
+}
+
+bootJar {
+    enabled = false
+}
+
+// Publishing configuration for local builds
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+
+            artifactId = 'crm-shared-lib'
+
+            pom {
+                name = 'CRM Shared Library'
+                description = 'Shared components for CRM microservices'
+            }
+        }
+    }
+}

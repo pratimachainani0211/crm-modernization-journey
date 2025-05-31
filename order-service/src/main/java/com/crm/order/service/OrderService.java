@@ -1,12 +1,11 @@
 package com.crm.order.service;
 
-import com.crm.order.client.CustomerClient;
+import com.crm.order.client.CustomerServiceClient;
 import com.crm.order.entity.Order;
 import com.crm.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.crm.order.repository.OrderRepository;
 
 import java.util.List;
 
@@ -16,7 +15,7 @@ import java.util.List;
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    private final CustomerClient customerClient;
+    private final CustomerServiceClient customerServiceClient;
 
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
@@ -28,7 +27,7 @@ public class OrderService {
 
     public Order createOrder(Order order) {
         // Validate customer exists
-        customerClient.getCustomer(order.getCustomerId());
+        customerServiceClient.getCustomer(order.getCustomerId());
         return orderRepository.save(order);
     }
 }

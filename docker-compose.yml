@@ -1,80 +1,73 @@
-version: '3.8'
-
 services:
-  legacy-db:
-    image: postgres:15
-    container_name: legacy-crm-db
-    environment:
-      POSTGRES_DB: legacy_crm
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-    ports:
-      - "5432:5432"
-    volumes:
-      - legacy_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d legacy_crm"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
-  customer-db:
-    image: postgres:15
-    container_name: customer-service-db
-    environment:
-      POSTGRES_DB: customer_service
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-    ports:
-      - "5433:5432"
-    volumes:
-      - customer_data:/var/lib/postgresql/data
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres -d customer_service" ]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
-  legacy-app:
-    build: ./legacy-crm
-    container_name: legacy-crm-app
-    ports:
-      - "8080:8080"
-    depends_on:
-      legacy-db:
-        condition: service_healthy  # Wait for DB health check
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://legacy-db:5432/legacy_crm
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: password
-
+  # Using Solution 1 (single multi-stage Dockerfile)
   api-gateway:
-    build: ./api-gateway
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
     ports:
       - "8000:8000"
-    depends_on:
-      legacy-app:
-        condition: service_started
-      customer-service:
-        condition: service_started
     environment:
-      LEGACY_SERVICE_URL: http://legacy-app:8080
-      SERVER_PORT: 8000
-      CUSTOMER_SERVICE_URL: http://customer-service:8081
+      - SPRING_PROFILES_ACTIVE=docker
+#    depends_on:
+#      redis:
+#        condition: service_started
+#      zipkin:
+#        condition: service_started
 
   customer-service:
-    build: ./customer-service
+    build:
+      context: .
+      dockerfile: customer-service/Dockerfile
     ports:
       - "8081:8081"
-    depends_on:
-      customer-db:
-        condition: service_healthy
     environment:
-      SERVER_PORT: 8081
-      SPRING_DATASOURCE_URL: jdbc:postgresql://customer-db:5432/customer_service
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: password
+      - SPRING_PROFILES_ACTIVE=docker
+#    depends_on:
+#      redis:
+#        condition: service_started
+#      zipkin:
+#        condition: service_started
 
-volumes:
-  legacy_data:
-  customer_data:
+  order-service:
+    build:
+      context: .
+      dockerfile: order-service/Dockerfile
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+#      redis:
+#        condition: service_started
+#      zipkin:
+#        condition: service_started
+      customer-service:
+        condition: service_started
+
+  # Infrastructure services
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+#  zipkin:
+#    image: openzipkin/zipkin:latest
+#    ports:
+#      - "9411:9411"
+#
+#  prometheus:
+#    image: prom/prometheus:latest
+#    ports:
+#      - "9090:9090"
+#    volumes:
+#      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+#
+#  grafana:
+#    image: grafana/grafana:latest
+#    ports:
+#      - "3000:3000"
+#    environment:
+#      - GF_SECURITY_ADMIN_PASSWORD=admin
+#    volumes:
+#      - ./monitoring/datasources:/etc/grafana/provisioning/datasources
+#      - ./monitoring/dashboards:/etc/grafana/provisioning/dashboards

@@ -1,0 +1,6 @@
+rootProject.name = 'crm-modernization-journey'
+
+include 'shared-lib'
+include 'api-gateway'
+include 'customer-service'
+include 'order-service'

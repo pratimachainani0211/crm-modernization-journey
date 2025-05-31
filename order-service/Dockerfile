@@ -1,40 +1,36 @@
-# Phase 3: Order Service Dockerfile
-FROM openjdk:17-jdk-slim
+# order-service/Dockerfile
+FROM openjdk:17-slim AS builder
 
-# Install curl for health checks and debugging
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
-
-# Set working directory
 WORKDIR /app
 
-# Copy gradle wrapper and build files (for better layer caching)
-COPY gradlew .
-COPY gradlew.bat .
+# Copy everything needed for the build
+COPY gradlew gradlew.bat ./
 COPY gradle/ gradle/
-COPY build.gradle .
-COPY settings.gradle .
+COPY settings.gradle build.gradle ./
 
-# Make gradlew executable
+# Copy ALL modules (this is key!)
+COPY shared-lib/ shared-lib/
+COPY order-service/ order-service/
+
 RUN chmod +x gradlew
 
-# Download dependencies first (better Docker layer caching)
-RUN ./gradlew dependencies --no-daemon
+# Build the entire project - this automatically handles shared-lib dependency
+RUN ./gradlew :order-service:build -x test --no-daemon
 
-# Copy source code
-COPY src/ src/
+# Runtime stage
+FROM openjdk:17-slim
 
-# Build the application
-RUN ./gradlew build -x test --no-daemon
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
-# Copy the executable JAR (avoiding plain JAR)
-RUN cp build/libs/order-service.jar app.jar
+WORKDIR /app
 
-# Expose Order Service port
+COPY --from=builder /app/order-service/build/libs/order-service-*.jar app.jar
+
 EXPOSE 8082
 
-# Health check for Order Service
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
   CMD curl -f http://localhost:8082/actuator/health || exit 1
 
-# Run the Order Service application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENV JAVA_OPTS="-Xmx512m -Xms256m -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
+
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]

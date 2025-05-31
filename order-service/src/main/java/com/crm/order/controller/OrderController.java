@@ -1,6 +1,5 @@
 package com.crm.order.controller;
 
-import com.crm.customer.entity.Customer;
 import com.crm.order.entity.Order;
 import com.crm.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +31,7 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Order> getOrderByCustomerId(@PathVariable Long id) {
+    public ResponseEntity<List<Order>> getOrderByCustomerId(@PathVariable Long id) {
         return ResponseEntity.ok(orderService.getOrderByCustomerId(id));
     }
 }
